@@ -1,24 +1,1010 @@
-<!doctype html>
-<html lang="ar">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>indox.html</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>اللوحة الرئيسية - Dashboard & leIN Tv Plus</title>
+  
+  <!-- FontAwesome & Plyr CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
+  
   <style>
-    body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; direction: rtl; padding: 2rem; }
-    header { border-bottom: 1px solid #ddd; margin-bottom: 1rem; }
+    :root {
+      --primary-color: #5E35BD;
+      --primary-hover: #4a2899;
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --sidebar-width: 250px;
+    }
+
+    /* الوضع الليلي (Dark Mode) الموحد للوحة وقسم TV */
+    body.dark-theme {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 1. الشريط الجانبي (Sidebar) */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--card-bg);
+      border-left: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      z-index: 100;
+    }
+
+    .sidebar-brand {
+      padding: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 15px 10px;
+      flex: 1;
+    }
+
+    .sidebar-menu li {
+      margin-bottom: 5px;
+    }
+
+    .sidebar-menu a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .sidebar-menu a:hover,
+    .sidebar-menu a.active {
+      background-color: var(--primary-color);
+      color: #ffffff;
+    }
+
+    /* 2. الحاوية الرئيسية (Main Wrapper) */
+    .main-wrapper {
+      margin-right: var(--sidebar-width);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* 3. الشريط العلوي (Navbar) */
+    .navbar {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    .navbar-left, .navbar-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .theme-toggle-btn {
+      background: none;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 50%;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+    }
+
+    .btn-logout {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-logout:hover {
+      background-color: #dc2626;
+    }
+
+    /* 4. محتوى اللوحة */
+    .content {
+      padding: 30px;
+      flex: 1;
+    }
+
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* كارت الترحيب والإحصائيات */
+    .welcome-card {
+      background: linear-gradient(135deg, var(--primary-color), #818cf8);
+      color: white;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background-color: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .recent-section {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 20px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+    }
+
+    .data-table th, .data-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    /* ========================================================= */
+    /* 5. تنسيقات leIN Tv Plus المحدثة وداعمة للوضع الليلي */
+    /* ========================================================= */
+    .tv-header {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+    
+    .tv-app-name {
+      margin: 0;
+      font-size: 32px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      background: linear-gradient(to right, #5E35BD, #d057a1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .matches-btn {
+      background: linear-gradient(45deg, #5E35BD, #d057a1);
+      color: white;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 15px;
+      display: inline-flex;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(142, 45, 226, 0.4);
+      transition: transform 0.3s;
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 20px;
+    }
+
+    .category {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+      border: 1px solid var(--border-color);
+      text-align: center;
+      padding: 12px;
+    }
+
+    .category:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary-color);
+    }
+
+    .category img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: var(--bg-color);
+    }
+
+    .category span {
+      display: block;
+      padding-top: 10px;
+      font-weight: bold;
+      color: var(--text-main);
+    }
+
+    .channels-section {
+      display: none;
+    }
+    
+    .channels-section.active {
+      display: block;
+    }
+
+    .back-btn {
+      background: var(--primary-color);
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--card-bg);
+      color: var(--text-main);
+      font-size: 1em;
+    }
+
+    .channels-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .channel {
+      display: flex;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    .channel img {
+      width: 50px;
+      height: 50px;
+      margin-left: 15px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: var(--bg-color);
+    }
+
+    .channel span {
+      flex-grow: 1;
+      font-size: 1.1em;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .watch-btn {
+      background: var(--primary-color);
+      color: #fff;
+      padding: 8px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .watch-btn:hover {
+      background: var(--primary-hover);
+    }
+
+    /* شاشة المشغل */
+    .player-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: #000;
+      z-index: 100000;
+      overflow: hidden;
+    }
+
+    #player {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+    }
+
+    .server-selection {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 8px 12px;
+      border-radius: 8px;
+      z-index: 100003;
+      max-width: 90vw;
+      overflow-x: auto;
+    }
+
+    .server-selection.visible {
+      display: flex;
+    }
+
+    .server-btn {
+      background: #333;
+      color: #fff;
+      padding: 6px 14px;
+      border: 1px solid #555;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85em;
+      white-space: nowrap;
+    }
+
+    .server-btn.active {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .server-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .player-back-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: #ef4444;
+      color: #fff;
+      padding: 8px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      z-index: 100003;
+      font-weight: bold;
+    }
+
+    .loading-spinner {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 4px solid #333;
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      z-index: 100003;
+    }
+
+    .video-error {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ff4444;
+      background: rgba(0,0,0,0.9);
+      border: 1px solid #ff4444;
+      padding: 15px 25px;
+      border-radius: 8px;
+      z-index: 100003;
+      text-align: center;
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main-wrapper { margin-right: 0; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>مرحبًا — indox.html</h1>
-  </header>
-  <main>
-    <p>هذه صفحة HTML افتراضية أُنشئت ورفعت إلى المستودع باسم <strong>indox.html</strong>.</p>
-    <p>يمكنك تعديل هذه الصفحة لاحقًا بمحتوى المشروع الفعلي.</p>
-  </main>
-  <footer>
-    <p>نُشِر بواسطة: dechouc/lein-tv-plus-</p>
-  </footer>
+
+  <!-- الشريط الجانبي -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <i class="fa-solid fa-rocket"></i>
+      <span>منصتي الرقمية</span>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#" class="nav-link active" data-tab="dashboard-tab"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
+      <li><a href="#" class="nav-link" data-tab="tv-tab"><i class="fa-solid fa-tv"></i> تلفزيون leIN TV</a></li>
+    </ul>
+  </aside>
+
+  <!-- الحاوية الرئيسية -->
+  <div class="main-wrapper">
+    
+    <!-- الشريط العلوي -->
+    <header class="navbar">
+      <div class="navbar-right">
+        <h2 id="pageTitle">اللوحة الرئيسية</h2>
+      </div>
+      <div class="navbar-left">
+        <!-- زر التبديل بين الوضع الليلي والنهاري -->
+        <button class="theme-toggle-btn" id="themeToggleBtn" title="تغيير المظهر">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+
+        <div class="user-profile">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div>
+            <div id="userName" style="font-size: 14px; font-weight: bold;">مستخدم</div>
+            <div id="userEmail" style="font-size: 12px; color: var(--text-muted);">جاري التحميل...</div>
+          </div>
+        </div>
+
+        <button class="btn-logout" id="logoutBtn">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          خروج
+        </button>
+      </div>
+    </header>
+
+    <!-- محتوى الصفحة -->
+    <main class="content">
+      
+      <!-- 1. تبويب اللوحة الرئيسية -->
+      <div id="dashboard-tab" class="tab-content active">
+        <section class="welcome-card">
+          <h1 id="welcomeTitle">مرحباً بك مجدداً! 👋</h1>
+          <p>يسعدنا رؤيتك اليوم، إليك نظرة سريعة على آخر التحديثات الخاصة بحسابك.</p>
+        </section>
+
+        <section class="stats-grid">
+          <div class="stat-card">
+            <div>
+              <h3 style="color:var(--text-muted); font-size:14px;">إجمالي الرصيد</h3>
+              <p style="font-size:22px; font-weight:bold;">$12,450</p>
+            </div>
+            <i class="fa-solid fa-wallet" style="font-size:24px; color:var(--primary-color);"></i>
+          </div>
+          <div class="stat-card">
+            <div>
+              <h3 style="color:var(--text-muted); font-size:14px;">المشاريع النشطة</h3>
+              <p style="font-size:22px; font-weight:bold;">8 مشاريع</p>
+            </div>
+            <i class="fa-solid fa-diagram-project" style="font-size:24px; color:var(--primary-color);"></i>
+          </div>
+        </section>
+      </div>
+
+      <!-- 2. تبويب تلفزيون leIN Tv Plus -->
+      <div id="tv-tab" class="tab-content">
+        <div class="tv-header">
+          <h1 class="tv-app-name">leIN Tv Plus</h1>
+          <button class="matches-btn" onclick="window.open('https://aminelivematch.web.app', '_blank')">
+             <i class="fa-solid fa-trophy" style="margin-left:8px;"></i> مباريات اليوم
+          </button>
+        </div>
+
+        <div>
+          <div class="categories-grid" id="categoriesGrid"></div>
+          
+          <div class="channels-section" id="channelsSection">
+            <button class="back-btn" id="backToCategoriesBtn"><i class="fa-solid fa-arrow-right"></i> رجوع للأقسام</button>
+            <h2 id="categoryTitle" style="margin-bottom: 15px;"></h2>
+            <input type="text" class="search-box" id="searchBox" placeholder="ابحث عن قناة...">
+            <div class="channels-list" id="channelsList"></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- حاوية مشغل الفيديو -->
+  <div class="player-container" id="playerContainer">
+    <button class="player-back-btn" id="playerBackBtn">إغلاق <i class="fa-solid fa-xmark"></i></button>
+    <div class="server-selection" id="serverSelection"></div>
+    <div class="loading-spinner" id="loadingSpinner"></div>
+    <p class="video-error" id="videoError"></p>
+    <video id="player" controls playsinline poster="https://www.appcreator24.com/srv/imgs/gen/4125631_ico.png"></video>
+  </div>
+
+  <!-- المكتبات البرمجية -->
+  <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dash.js@4.7.0/dist/dash.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.3.5/dist/shaka-player.compiled.min.js"></script>
+
+  <!-- Firebase v10 الحديث المتوافق -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // إعدادات Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAlabzf0ieRl3z0MKrO8ZDjacvVcon9PSQ",
+      authDomain: "lein-tv-plus-8de6a.firebaseapp.com",
+      databaseURL: "https://lein-tv-plus-8de6a-default-rtdb.firebaseio.com",
+      projectId: "lein-tv-plus-8de6a",
+      storageBucket: "lein-tv-plus-8de6a.firebasestorage.app",
+      messagingSenderId: "1052155767756",
+      appId: "1:1052155767756:web:f268295fdfaaa3b0c84b69",
+      measurementId: "G-XS467Z0MGS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // عناصر الدخول
+    const userEmailEl = document.getElementById("userEmail");
+    const userNameEl = document.getElementById("userName");
+    const userAvatarEl = document.getElementById("userAvatar");
+    const welcomeTitleEl = document.getElementById("welcomeTitle");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const email = user.email;
+        const name = user.displayName || email.split('@')[0];
+        
+        userEmailEl.textContent = email;
+        userNameEl.textContent = name;
+        userAvatarEl.textContent = name.charAt(0).toUpperCase();
+        welcomeTitleEl.textContent = `مرحباً بك مجدداً، ${name}! 👋`;
+      } else {
+        window.location.href = "index.html"; 
+      }
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "index.html";
+      } catch (error) {
+        alert("حدث خطأ أثناء تسجيل الخروج: " + error.message);
+      }
+    });
+
+    // تبديل الوضع الليلي والنهاري (دعم كامل لكافة العناصر)
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    themeToggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("dark-theme");
+      const icon = themeToggleBtn.querySelector("i");
+      icon.className = document.body.classList.contains("dark-theme") ? "fa-solid fa-sun" : "fa-solid fa-moon";
+    });
+
+    // التنقل بين التبويبات
+    const navLinks = document.querySelectorAll(".sidebar-menu .nav-link");
+    const tabContents = document.querySelectorAll(".tab-content");
+    const pageTitle = document.getElementById("pageTitle");
+
+    navLinks.forEach(link => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        
+        navLinks.forEach(l => l.classList.remove("active"));
+        tabContents.forEach(c => c.classList.remove("active"));
+
+        link.classList.add("active");
+        const targetTab = link.getAttribute("data-tab");
+        document.getElementById(targetTab).classList.add("active");
+
+        pageTitle.textContent = link.textContent.trim();
+
+        if(targetTab === "tv-tab") {
+          loadCategories();
+        }
+      });
+    });
+
+    // =========================================================
+    // تشغيل TV القنوات والسيرفرات والمشغل
+    // =========================================================
+    let player, hls, dashPlayer, shakaPlayer, currentServer = 'url', currentChannelServers = {};
+    const serverOrder = ['url', 'hd', 'sd', 'low', 'backup1', 'backup2'];
+    let fallbackTimeout;
+
+    function initializePlayer() {
+      try {
+        const videoElement = document.getElementById('player');
+        if (!videoElement) return;
+
+        player = new Plyr(videoElement, {
+          controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+          autoplay: true,
+          playsinline: true,
+          hideControls: false
+        });
+
+        player.on('error', () => {
+          showError('خطأ في تشغيل القناة، جاري الانتقال للسيرفر التالي...');
+          tryNextServer();
+        });
+
+        player.on('canplay', () => {
+          clearTimeout(fallbackTimeout);
+          hideSpinner();
+          showServerControls();
+        });
+
+        document.getElementById('playerBackBtn').addEventListener('click', handlePlayerBack);
+
+      } catch (err) {
+        console.error('Player Init Error:', err);
+      }
+    }
+
+    function showServerControls() {
+      document.getElementById('serverSelection').classList.add('visible');
+    }
+
+    function showSpinner() {
+      document.getElementById('loadingSpinner').style.display = 'block';
+      document.getElementById('videoError').style.display = 'none';
+    }
+
+    function hideSpinner() {
+      document.getElementById('loadingSpinner').style.display = 'none';
+    }
+
+    function showError(message) {
+      const error = document.getElementById('videoError');
+      if (error) {
+        error.textContent = message;
+        error.style.display = 'block';
+        hideSpinner();
+      }
+    }
+
+    // تحميل الأقسام
+    async function loadCategories() {
+      const categoriesGrid = document.getElementById('categoriesGrid');
+      if (!categoriesGrid) return;
+
+      categoriesGrid.innerHTML = '<p>جاري تحميل الأقسام...</p>';
+
+      try {
+        const dbRef = ref(db);
+        const snapshot = await get(child(dbRef, 'categories'));
+
+        if (!snapshot.exists()) {
+          categoriesGrid.innerHTML = '<p style="color: #ff4444;">لا توجد أقسام متاحة في قاعدة البيانات.</p>';
+          return;
+        }
+
+        const categoriesData = snapshot.val();
+        categoriesGrid.innerHTML = '';
+        
+        Object.keys(categoriesData).forEach(key => {
+          const data = categoriesData[key];
+          if (data && data.name && data.image) {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'category';
+            categoryDiv.innerHTML = `
+              <img src="${data.image}" alt="${data.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/150';">
+              <span>${data.name}</span>
+            `;
+            categoryDiv.onclick = () => loadChannels(key, data.name);
+            categoriesGrid.appendChild(categoryDiv);
+          }
+        });
+      } catch (error) {
+        categoriesGrid.innerHTML = `<p style="color: #ff4444;">خطأ في الاتصال: ${error.message}</p>`;
+      }
+    }
+
+    // تحميل القنوات
+    async function loadChannels(categoryId, categoryName) {
+      const channelsSection = document.getElementById('channelsSection');
+      const channelsList = document.getElementById('channelsList');
+      const categoryTitle = document.getElementById('categoryTitle');
+      const categoriesGrid = document.getElementById('categoriesGrid');
+      const searchBox = document.getElementById('searchBox');
+
+      categoryTitle.textContent = categoryName;
+      channelsList.innerHTML = '<p>جاري تحميل القنوات...</p>';
+      categoriesGrid.style.display = 'none';
+      channelsSection.style.display = 'block';
+      channelsSection.classList.add('active');
+
+      try {
+        const dbRef = ref(db);
+        const snapshot = await get(child(dbRef, 'channels'));
+        channelsList.innerHTML = '';
+
+        if (!snapshot.exists()) {
+          channelsList.innerHTML = '<p style="color: #ff4444;">لا توجد قنوات متاحة.</p>';
+          return;
+        }
+
+        const channels = [];
+        snapshot.forEach(childSnap => {
+          const data = childSnap.val();
+          if (data && data.category === categoryId) {
+            data.id = childSnap.key;
+            channels.push(data);
+          }
+        });
+
+        displayChannels(channels);
+
+        searchBox.value = '';
+        searchBox.oninput = () => {
+          const searchText = searchBox.value.toLowerCase();
+          const filtered = channels.filter(c => c.name && c.name.toLowerCase().includes(searchText));
+          displayChannels(filtered);
+        };
+      } catch (error) {
+        channelsList.innerHTML = `<p style="color: #ff4444;">خطأ: ${error.message}</p>`;
+      }
+    }
+
+    function displayChannels(channels) {
+      const channelsList = document.getElementById('channelsList');
+      channelsList.innerHTML = '';
+
+      if (channels.length === 0) {
+        channelsList.innerHTML = '<p>لا توجد قنوات في هذا القسم.</p>';
+        return;
+      }
+
+      channels.forEach(data => {
+        if (!data.name || !data.logo) return;
+        
+        const servers = {
+          url: data.url || '',
+          hd: data.hd_url || '',
+          sd: data.sd_url || '',
+          low: data.low_url || '',
+          backup1: data.backup1_url || '',
+          backup2: data.backup2_url || ''
+        };
+
+        const channelDiv = document.createElement('div');
+        channelDiv.className = 'channel';
+        channelDiv.innerHTML = `
+          <img src="${data.logo}" alt="${data.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/50';">
+          <span>${data.name}</span>
+          <button class="watch-btn">مشاهدة</button>
+        `;
+        
+        channelDiv.querySelector('.watch-btn').onclick = () => playChannel(servers);
+        channelsList.appendChild(channelDiv);
+      });
+    }
+
+    document.getElementById('backToCategoriesBtn').onclick = function() {
+      document.getElementById('channelsSection').style.display = 'none';
+      document.getElementById('categoriesGrid').style.display = 'grid';
+    };
+
+    async function playChannel(servers) {
+      currentChannelServers = servers;
+      currentServer = 'url';
+      
+      const playerContainer = document.getElementById('playerContainer');
+      playerContainer.style.display = 'block';
+
+      showSpinner();
+      showServerControls();
+      createServerButtons();
+
+      await switchServer(currentServer);
+      fallbackTimeout = setTimeout(tryNextServer, 10000);
+    }
+
+    function createServerButtons() {
+      const serverSelection = document.getElementById('serverSelection');
+      serverSelection.innerHTML = '';
+
+      const servers = [
+        { key: 'url', label: 'الأساسي' },
+        { key: 'hd', label: 'HD' },
+        { key: 'sd', label: 'SD' },
+        { key: 'low', label: 'Low' },
+        { key: 'backup1', label: 'الاحتياطي 1' },
+        { key: 'backup2', label: 'الاحتياطي 2' }
+      ];
+
+      servers.forEach(server => {
+        const serverUrl = currentChannelServers[server.key];
+        const button = document.createElement('button');
+        button.className = 'server-btn';
+        button.textContent = server.label;
+        
+        button.onclick = (e) => {
+          e.stopPropagation();
+          switchServer(server.key);
+        };
+
+        if (server.key === currentServer) button.classList.add('active');
+        if (!serverUrl || !isValidUrl(serverUrl)) button.disabled = true;
+
+        serverSelection.appendChild(button);
+      });
+    }
+
+    async function tryNextServer() {
+      const currentIndex = serverOrder.indexOf(currentServer);
+      const nextIndex = currentIndex + 1;
+
+      if (nextIndex < serverOrder.length) {
+        const nextServer = serverOrder[nextIndex];
+        if (currentChannelServers[nextServer] && isValidUrl(currentChannelServers[nextServer])) {
+          await switchServer(nextServer);
+          fallbackTimeout = setTimeout(tryNextServer, 10000);
+        } else {
+          tryNextServer();
+        }
+      } else {
+        showError('جميع السيرفرات الخاصة بهذه القناة متوقفة حالياً.');
+      }
+    }
+
+    async function switchServer(serverKey) {
+      clearTimeout(fallbackTimeout);
+      currentServer = serverKey;
+      const url = currentChannelServers[serverKey];
+
+      if (!url || !isValidUrl(url)) {
+        tryNextServer();
+        return;
+      }
+
+      const buttons = document.querySelectorAll('.server-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      await cleanupPlayer();
+      showSpinner();
+
+      const videoElement = document.getElementById('player');
+      videoElement.style.display = 'block';
+
+      try {
+        if (url.includes('.m3u8') && Hls.isSupported()) {
+          hls = new Hls({ enableWorker: true, lowLatencyMode: true });
+          hls.loadSource(url);
+          hls.attachMedia(videoElement);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            hideSpinner();
+            player.play().catch(e => console.log(e));
+          });
+          hls.on(Hls.Events.ERROR, () => tryNextServer());
+        } else {
+          videoElement.src = url;
+          player.source = { type: 'video', sources: [{ src: url }] };
+          videoElement.load();
+          videoElement.addEventListener('canplay', () => {
+            hideSpinner();
+            player.play().catch(e => console.log(e));
+          }, { once: true });
+        }
+      } catch (err) {
+        tryNextServer();
+      }
+    }
+
+    async function cleanupPlayer() {
+      if (player) player.stop();
+      if (hls) { hls.destroy(); hls = null; }
+      if (dashPlayer) { dashPlayer.reset(); dashPlayer = null; }
+      if (shakaPlayer) { await shakaPlayer.destroy(); shakaPlayer = null; }
+
+      const videoElement = document.getElementById('player');
+      if (videoElement) {
+        videoElement.src = '';
+        videoElement.load();
+      }
+    }
+
+    function handlePlayerBack() {
+      cleanupPlayer().then(() => {
+        document.getElementById('playerContainer').style.display = 'none';
+        hideSpinner();
+      });
+    }
+
+    function isValidUrl(url) {
+      if (!url || typeof url !== 'string') return false;
+      try {
+        new URL(url);
+        return url.startsWith('http://') || url.startsWith('https://');
+      } catch {
+        return false;
+      }
+    }
+
+    window.addEventListener('load', initializePlayer);
+  </script>
 </body>
 </html>
